@@ -15,6 +15,10 @@ import Terms from "./pages/Terms";
 import Refund from "./pages/Refund";
 import Support from "./pages/Support";
 
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
+
+
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,7 +38,12 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/refund" element={<Refund />} />
           <Route path="/support" element={<Support />} />
+
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+
         </Routes>
+
       </main>
 
       <Footer />
