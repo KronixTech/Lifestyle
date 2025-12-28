@@ -37,7 +37,6 @@ export default function LoginModal({ open, onClose, onLogin }) {
         ? { mode, phone: phone.trim(), password }
         : { mode, email: email.trim(), password };
 
-    // For now just simulate login success
     onLogin?.(payload);
     onClose?.();
   }

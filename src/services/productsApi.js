@@ -1,19 +1,14 @@
-import { sampleProducts } from "../data/sampleProducts";
+import { apiClient } from "../config/apiClient";
 
-// Toggle this to true when you get the real API
-const USE_REAL_API = false;
+export async function fetchProducts({ collection, limit = 20, skip = 0 } = {}) {
+  const params = {};
+  if (collection) params.collection = collection;
+  if (typeof limit === "number") params.limit = limit;
+  if (typeof skip === "number") params.skip = skip;
 
-// Put their base URL here later
-const BASE_URL = "https://example.com/api";
+  const res = await apiClient.get("/api", { params });
 
-export async function getProducts() {
-  if (!USE_REAL_API) {
-    // mimic network delay so UI feels real
-    await new Promise((r) => setTimeout(r, 300));
-    return sampleProducts;
-  }
-
-  const res = await fetch(`${BASE_URL}/products`);
-  if (!res.ok) throw new Error("Failed to load products");
-  return res.json();
+  return res.data;
 }
+
+export const getProducts = fetchProducts;

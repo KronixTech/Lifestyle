@@ -1,15 +1,53 @@
 import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "../context/CartContext";
 
 function pctOff(price, mrp) {
   if (!mrp || mrp <= price) return 0;
   return Math.round(((mrp - price) / mrp) * 100);
 }
 
-export default function ProductCard({ product, onLike, onAdd }) {
-  const off = pctOff(product.price, product.mrp);
+export default function ProductCard({ product }) {
+  const navigate = useNavigate();
+  const { isLiked, toggleWishlist } = useWishlist();
+  const { addToCart } = useCart();
+
+  const liked = isLiked(product?.id);
+  const off = pctOff(product?.price, product?.mrp);
+
+  const hasSizes = Array.isArray(product?.sizes) && product.sizes.length > 0;
+  const defaultSize = hasSizes ? product.sizes[0] : undefined;
+
+  const categoryLabel =
+    product?.category ||
+    (Array.isArray(product?.collections) && product.collections.length
+      ? product.collections[0]
+      : "Lifestyle");
+
+  function onLikeClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  }
+
+  function onAddToBag(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (hasSizes) {
+      navigate(`/products/${product.id}`);
+      return;
+    }
+
+    addToCart(product, 1, defaultSize);
+  }
 
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl">
+    <Link
+      to={`/products/${product.id}`}
+      className="group relative block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"
+    >
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
         <img
@@ -34,36 +72,45 @@ export default function ProductCard({ product, onLike, onAdd }) {
           </div>
         )}
 
-        {/* Hover actions */}
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-3 items-center gap-2 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <button
+          onClick={onLikeClick}
+          className={`absolute right-3 top-12 z-20 rounded-2xl p-2.5 shadow-md backdrop-blur transition active:scale-95 ${
+            liked
+              ? "bg-red-600 text-white hover:bg-red-500"
+              : "bg-white/90 text-slate-900 hover:bg-white"
+          }`}
+          aria-label={liked ? "Unlike product" : "Like product"}
+        >
+          <Heart className={`h-5 w-5 ${liked ? "fill-white" : ""}`} />
+        </button>
+
+        {/* Add-to-bag hover bar */}
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 flex translate-y-3 items-center gap-2 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <button
-            onClick={() => onAdd?.(product)}
+            onClick={onAddToBag}
             className="pointer-events-auto flex-1 rounded-2xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 active:scale-[0.99]"
           >
             <span className="inline-flex items-center justify-center gap-2">
-              <ShoppingBag className="h-4 w-4" /> Add
+              <ShoppingBag className="h-4 w-4" />
+              {hasSizes ? "Select Size" : "Add to Bag"}
             </span>
-          </button>
-          <button
-            onClick={() => onLike?.(product)}
-            className="pointer-events-auto rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50 active:scale-[0.99]"
-            aria-label="Like product"
-          >
-            <Heart className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <p className="text-xs font-semibold text-slate-500">{product.category}</p>
+        <p className="text-xs font-semibold text-slate-500">{categoryLabel}</p>
+
         <h3 className="mt-1 line-clamp-1 text-sm font-extrabold text-slate-900">
           {product.name}
         </h3>
 
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-end gap-2">
-            <p className="text-base font-extrabold text-slate-900">₹{product.price}</p>
+            <p className="text-base font-extrabold text-slate-900">
+              ₹{product.price}
+            </p>
             {product.mrp && (
               <p className="text-sm text-slate-500 line-through">₹{product.mrp}</p>
             )}
@@ -71,11 +118,11 @@ export default function ProductCard({ product, onLike, onAdd }) {
 
           <div className="flex items-center gap-1 text-xs font-semibold text-slate-700">
             <Star className="h-4 w-4" />
-            <span>{product.rating}</span>
-            <span className="text-slate-400">({product.reviews})</span>
+            <span>{product.rating ?? 4.4}</span>
+            <span className="text-slate-400">({product.reviews ?? 120})</span>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -82,7 +82,7 @@ export default function HomeHeroCarousel() {
               ))}
             </div>
 
-            {/* Arrows (mobile-friendly) */}
+            {/* Arrows */}
             <div className="mt-6 flex items-center gap-2 lg:hidden">
               <button
                 onClick={prev}
@@ -111,7 +111,7 @@ export default function HomeHeroCarousel() {
               draggable="false"
             />
 
-            {/* Dark gradient for readability */}
+            {/* Dark gradient */}
             <div className="absolute inset-0 bg-gradient-to-tr from-black/25 via-transparent to-black/10" />
 
             {/* Desktop arrows */}
